@@ -7,31 +7,33 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import {AppConfig} from './src/config/app';
+import {useTheme} from './src/hooks/use_theme';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const barStyle = isDarkMode ? 'light-content' : 'dark-content';
+  const theme = useTheme();
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode
-      ? AppConfig.theme.dark.background
-      : AppConfig.theme.light.background,
+    backgroundColor: theme.background,
+  };
+
+  const headerStyle = {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
   };
 
   return (
     <SafeAreaView style={[styles.container, backgroundStyle]}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={AppConfig.theme.light.primary}
-      />
-      <View style={styles.header}>
+      <StatusBar barStyle={barStyle} backgroundColor={theme.background} />
+      <View style={headerStyle}>
         <Text
           style={[
             styles.headerTitle,
             {
-              color: isDarkMode
-                ? AppConfig.theme.dark.text
-                : AppConfig.theme.light.text,
+              color: theme.text,
             },
           ]}>
           Shiftly
@@ -40,9 +42,7 @@ function App(): React.JSX.Element {
           style={[
             styles.headerSubtitle,
             {
-              color: isDarkMode
-                ? AppConfig.theme.dark.textSecondary
-                : AppConfig.theme.light.textSecondary,
+              color: theme.textSecondary,
             },
           ]}>
           Управление сменами
@@ -55,12 +55,6 @@ function App(): React.JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: AppConfig.theme.light.border,
   },
   headerTitle: {
     fontSize: 28,
