@@ -1,13 +1,8 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {StatusBar, StyleSheet, Text, useColorScheme, View} from 'react-native';
+import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import {useTheme} from './src/hooks/use_theme';
+import AppNavigator from './src/navigation/app_navigator';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -26,29 +21,32 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <SafeAreaView style={[styles.container, backgroundStyle]}>
-      <StatusBar barStyle={barStyle} backgroundColor={theme.background} />
-      <View style={headerStyle}>
-        <Text
-          style={[
-            styles.headerTitle,
-            {
-              color: theme.text,
-            },
-          ]}>
-          Shiftly
-        </Text>
-        <Text
-          style={[
-            styles.headerSubtitle,
-            {
-              color: theme.textSecondary,
-            },
-          ]}>
-          Управление сменами
-        </Text>
-      </View>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={[styles.container, backgroundStyle]}>
+        <StatusBar barStyle={barStyle} backgroundColor={theme.background} />
+        <View style={headerStyle}>
+          <Text
+            style={[
+              styles.headerTitle,
+              {
+                color: theme.text,
+              },
+            ]}>
+            Shiftly
+          </Text>
+          <Text
+            style={[
+              styles.headerSubtitle,
+              {
+                color: theme.textSecondary,
+              },
+            ]}>
+            Управление сменами
+          </Text>
+        </View>
+        <AppNavigator />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

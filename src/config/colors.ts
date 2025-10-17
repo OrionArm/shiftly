@@ -22,6 +22,12 @@ export const colors = {
     // Границы и разделители
     border: '#e0e0e0',
     divider: '#f0f0f0',
+
+    // Статусные цвета
+    success: '#28a745',
+    warning: '#ffc107',
+    error: '#dc3545',
+    info: '#17a2b8',
   },
   dark: {
     // Основные цвета
@@ -46,6 +52,12 @@ export const colors = {
     // Границы и разделители
     border: '#3a3a3c',
     divider: '#2a2a2c',
+
+    // Статусные цвета
+    success: '#34c759',
+    warning: '#ff9500',
+    error: '#ff3b30',
+    info: '#5ac8fa',
   },
 } as const;
 
