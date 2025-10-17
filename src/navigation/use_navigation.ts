@@ -21,29 +21,11 @@ export const useNavigation = () => {
     }
   }, [currentScreen]);
 
-  const getHeaderTitle = useCallback((): string => {
-    switch (currentScreen) {
-      case 'ShiftList':
-        return 'Доступные смены';
-      case 'ShiftDetails':
-        return 'Детали смены';
-      default:
-        return 'Доступные смены';
-    }
-  }, [currentScreen]);
-
-  const showBackButton = useMemo(
-    () => currentScreen === 'ShiftDetails',
-    [currentScreen],
-  );
-
   return {
     currentScreen,
     selectedShift,
     navigateToShiftList,
     navigateToShiftDetails,
     goBack,
-    getHeaderTitle,
-    showBackButton,
   };
 };

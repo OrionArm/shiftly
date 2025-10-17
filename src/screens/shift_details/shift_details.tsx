@@ -75,7 +75,7 @@ export const ShiftDetailsScreen = ({ shift }: Props) => {
           onPress={() => {
             console.log('Запись на смену');
           }}>
-          <Text style={[styles.buttonText, { color: theme.text }]}>
+          <Text style={[styles.buttonText, { color: theme.textOnDark }]}>
             Записаться на смену
           </Text>
         </TouchableOpacity>

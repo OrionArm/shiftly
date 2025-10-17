@@ -18,6 +18,7 @@ export const colors = {
     text: '#333333',
     textSecondary: '#666666',
     textTertiary: '#999999',
+    textOnDark: '#ffffff',
 
     // Границы и разделители
     border: '#e0e0e0',
@@ -48,6 +49,7 @@ export const colors = {
     text: '#ffffff',
     textSecondary: '#cccccc',
     textTertiary: '#999999',
+    textOnDark: '#ffffff',
 
     // Границы и разделители
     border: '#3a3a3c',

@@ -11,16 +11,11 @@ const styles = StyleSheet.create({
 });
 
 export default function AppNavigator() {
-  const {
-    currentScreen,
-    selectedShift,
-    navigateToShiftDetails,
-    goBack,
-    getHeaderTitle,
-    showBackButton,
-  } = useNavigation();
+  const { currentScreen, selectedShift, navigateToShiftDetails, goBack } =
+    useNavigation();
 
-  const headerTitle = getHeaderTitle();
+  const headerTitle = currentScreen === 'ShiftDetails' ? 'Детали смены' : '';
+  const showBackButton = currentScreen === 'ShiftDetails';
 
   return (
     <View style={styles.container}>

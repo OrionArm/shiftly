@@ -1,22 +1,28 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTheme } from '../hooks/use_theme';
 
 type Props = {
   title: string;
   onBack?: () => void;
 };
 
-export const Header = ({title, onBack}: Props) => {
-  return (
+export const Header = ({ title, onBack }: Props) => {
+  const theme = useTheme();
+  return title ? (
     <View style={styles.header}>
       {onBack && (
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>← Назад</Text>
+          <Text style={[styles.backButtonText, { color: theme.textOnDark }]}>
+            ← Назад
+          </Text>
         </TouchableOpacity>
       )}
-      <Text style={styles.headerTitle}>{title || 'Shiftly'}</Text>
+      <Text style={[styles.headerTitle, { color: theme.textOnDark }]}>
+        {title}
+      </Text>
     </View>
-  );
+  ) : null;
 };
 
 const styles = StyleSheet.create({
@@ -50,6 +56,5 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     includeFontPadding: false,
     textAlignVertical: 'center',
-    color: '#FFFFFF',
   },
 });
