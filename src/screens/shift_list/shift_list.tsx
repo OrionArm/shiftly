@@ -7,7 +7,7 @@ import { ShiftItem } from './shift_item';
 import { Shift } from '../../types/shift';
 
 type Props = {
-  onNavigateToDetails: (shift: any) => void;
+  onNavigateToDetails: (shift: Shift) => void;
 };
 
 export const ShiftListScreen = observer(({ onNavigateToDetails }: Props) => {

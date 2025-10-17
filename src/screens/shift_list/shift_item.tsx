@@ -1,36 +1,42 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
-import {ThemeColors} from '../../config/colors';
-import {ProgressBar} from './progress_bar';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { ThemeColors } from '../../config/colors';
+import { ProgressBar } from './progress_bar';
+import { Shift } from '../../types/shift';
 
 type Props = {
-  item: any;
+  item: Shift;
   theme: ThemeColors;
   onPress: () => void;
 };
 
-export const ShiftItem = ({item, theme, onPress}: Props) => {
+export const ShiftItem = ({ item, theme, onPress }: Props) => {
   return (
     <TouchableOpacity
       style={[
         styles.item,
-        {backgroundColor: theme.surface, borderColor: theme.border},
+        { backgroundColor: theme.surface, borderColor: theme.border },
       ]}
       onPress={onPress}
       activeOpacity={0.7}>
       <View style={styles.header}>
-        <Text style={[styles.companyName, {color: theme.text}]}>
-          {item.companyName}
-        </Text>
+        <View style={styles.headerContent}>
+          {item.logo && (
+            <Image source={{ uri: item.logo }} style={styles.logo} />
+          )}
+          <Text style={[styles.companyName, { color: theme.text }]}>
+            {item.companyName}
+          </Text>
+        </View>
       </View>
-      <Text style={[styles.address, {color: theme.textSecondary}]}>
+      <Text style={[styles.address, { color: theme.textSecondary }]}>
         {item.address}
       </Text>
-      <Text style={[styles.dateTime, {color: theme.primary}]}>
+      <Text style={[styles.dateTime, { color: theme.primary }]}>
         {item.dateStartByCity} • {item.timeStartByCity} - {item.timeEndByCity}
       </Text>
-      <Text style={[styles.price, {color: theme.secondary}]}>
-        {item.priceWorker} ₽
+      <Text style={[styles.price, { color: theme.secondary }]}>
+        {Number(item.priceWorker) || 0} ₽
       </Text>
       <View style={styles.progressSection}>
         <ProgressBar
@@ -60,14 +66,25 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    transform: [{scale: 1}],
+    transform: [{ scale: 1 }],
   },
   header: {
     marginBottom: 4,
   },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 12,
+  },
   companyName: {
     fontSize: 18,
     fontWeight: 'bold',
+    flex: 1,
   },
   address: {
     fontSize: 14,

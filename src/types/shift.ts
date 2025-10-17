@@ -12,13 +12,13 @@ export interface Shift {
   workTypes: WorkType[];
   priceWorker: number;
   bonusPriceWorker: number;
-  customerFeedbacksCount: number;
+  customerFeedbacksCount: string;
   customerRating: number;
   isPromotionEnabled: boolean;
 }
 
 type WorkType = {
-  id: string;
+  id: number;
   name: string;
   nameGt5: string;
   nameLt5: string;
