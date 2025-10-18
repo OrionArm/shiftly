@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function AppNavigator() {
+export function AppNavigator() {
   const { currentScreen, selectedShift, navigateToShiftDetails, goBack } =
     useNavigation();
 

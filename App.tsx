@@ -1,8 +1,14 @@
 import React from 'react';
-import {StatusBar, StyleSheet, Text, useColorScheme, View} from 'react-native';
-import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
-import {useTheme} from './src/hooks/use_theme';
-import AppNavigator from './src/navigation/app_navigator';
+import {
+  StatusBar,
+  StyleSheet,
+  Text,
+  useColorScheme,
+  View,
+} from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from './src/hooks/use_theme';
+import { AppNavigator } from './src/navigation/app_navigator';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';

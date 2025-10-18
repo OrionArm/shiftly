@@ -1,11 +1,11 @@
-import {makeAutoObservable} from 'mobx';
-import {Shift, Location} from '../types/shift';
-import {shiftService} from '../services/shift_service';
+import { makeAutoObservable } from 'mobx';
+import { Shift, Location } from '../types/shift';
+import { shiftService } from '../services/shift_service';
+import { locationService } from '../services/location_service';
 
 export class ShiftStore {
   shifts: Shift[] = [];
   selectedShift: Shift | null = null;
-  userLocation: Location | null = null;
   isLoading = false;
   error: string | null = null;
 
@@ -13,41 +13,33 @@ export class ShiftStore {
     makeAutoObservable(this);
   }
 
-  setShifts(shifts: Shift[]) {
-    this.shifts = shifts;
-  }
-
-  setSelectedShift(shift: Shift | null) {
-    this.selectedShift = shift;
-  }
-
-  setUserLocation(location: Location) {
-    this.userLocation = location;
-  }
-
-  setLoading(loading: boolean) {
-    this.isLoading = loading;
-  }
-
-  setError(error: string | null) {
-    this.error = error;
-  }
-
-  clearError() {
-    this.error = null;
-  }
-
   async loadShifts(): Promise<void> {
-    // TODO: заменить на реальную геолокацию
-    this.setUserLocation({latitude: 45.039268, longitude: 38.987221});
+    console.log('🔍 loadShifts вызван');
+    console.log('🔍 userLocation в loadShifts:', locationService.userLocation);
 
-    if (!this.userLocation) return;
+    if (!locationService.userLocation) {
+      console.log('🔍 userLocation отсутствует, получаем геолокацию...');
+      await locationService.getUserLocation();
+    }
+
+    if (!locationService.userLocation) {
+      console.log(
+        '❌ userLocation все еще отсутствует после попытки получения',
+      );
+      this.setError('Необходимо разрешить доступ к геолокации для поиска смен');
+      return;
+    }
+
     try {
+      console.log(
+        '✅ Загружаем смены для координат:',
+        locationService.userLocation,
+      );
       this.setLoading(true);
       this.clearError();
       const fetchedShifts = await shiftService.getShiftsByLocation(
-        this.userLocation.latitude,
-        this.userLocation.longitude,
+        locationService.userLocation.latitude,
+        locationService.userLocation.longitude,
       );
       this.setShifts(fetchedShifts);
     } catch (err) {
@@ -55,5 +47,21 @@ export class ShiftStore {
     } finally {
       this.setLoading(false);
     }
+  }
+
+  private setShifts(shifts: Shift[]) {
+    this.shifts = shifts;
+  }
+
+  private setLoading(loading: boolean) {
+    this.isLoading = loading;
+  }
+
+  private setError(error: string | null) {
+    this.error = error;
+  }
+
+  private clearError() {
+    this.error = null;
   }
 }
