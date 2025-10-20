@@ -1,6 +1,6 @@
 import Geolocation from '@react-native-community/geolocation';
 import { Location } from '../types/shift';
-import { Platform, PermissionsAndroid } from 'react-native';
+import { Platform, PermissionsAndroid, Alert, Linking } from 'react-native';
 
 export interface LocationPermissionResult {
   granted: boolean;
@@ -19,10 +19,6 @@ class LocationService {
   error: string | null = null;
 
   async getUserLocation(): Promise<void> {
-    console.log('🔍 LocationService: getUserLocation вызван');
-    console.log('🔍 isLocationLoading:', this.isLocationLoading);
-    console.log('🔍 userLocation:', this.userLocation);
-
     if (this.isLocationLoading || this.userLocation) return;
 
     try {
@@ -47,6 +43,62 @@ class LocationService {
       this.setLocationLoading(false);
     }
   }
+
+  async retryGetUserLocation(): Promise<void> {
+    this.userLocation = null;
+    this.locationPermissionGranted = false;
+    this.error = null;
+    
+    if (Platform.OS === 'ios') {
+      const hasPermission = await this.checkIOSPermissionStatus();
+      if (!hasPermission) {
+        this.showSettingsAlert();
+        return;
+      }
+    }
+    
+    await this.getUserLocation();
+  }
+
+  private async checkIOSPermissionStatus(): Promise<boolean> {
+    const result = await this.getPosition({
+      enableHighAccuracy: false,
+      timeout: 5000,
+      maximumAge: 0,
+    });
+    if ('location' in result) return true;
+    return result.errorCode !== 1; 
+  }
+
+  private showSettingsAlert(): void {
+    Alert.alert(
+      'Доступ к геолокации запрещен',
+      'Для поиска смен поблизости необходимо разрешить доступ к геолокации в настройках приложения.',
+      [
+        {
+          text: 'Отмена',
+          style: 'cancel',
+        },
+        {
+          text: 'Открыть настройки',
+          onPress: () => this.openAppSettings(),
+        },
+      ]
+    );
+  }
+
+  private async openAppSettings(): Promise<void> {
+    try {
+      if (Platform.OS === 'ios') {
+        await Linking.openURL('app-settings:');
+      } else {
+        await Linking.openSettings();
+      }
+    } catch (error) {
+      console.log('❌ Ошибка открытия настроек:', error);
+    }
+  }
+
 
   private setUserLocation(location: Location | null) {
     this.userLocation = location;
@@ -94,6 +146,8 @@ class LocationService {
           };
         }
       } else {
+        // Для iOS разрешение запрашивается автоматически при вызове getCurrentPosition
+        // Поэтому просто возвращаем true
         return { granted: true };
       }
     } catch (error) {
@@ -108,7 +162,7 @@ class LocationService {
   private async getCurrentLocation(): Promise<LocationResult> {
     try {
       const permissionResult = await this.requestPermission();
-
+      
       if (!permissionResult.granted) {
         return {
           location: null,
@@ -116,46 +170,65 @@ class LocationService {
         };
       }
 
-      return new Promise(resolve => {
-        Geolocation.getCurrentPosition(
-          position => {
-            const location: Location = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            };
-            resolve({ location });
-          },
-          error => {
-            let errorMessage = 'Ошибка получения геолокации';
-
-            if (error.code === 1) {
-              errorMessage = 'Пользователь отказал в доступе к геолокации';
-            } else if (error.code === 2) {
-              errorMessage = 'Ошибка определения местоположения';
-            } else if (error.code === 3) {
-              errorMessage = 'Превышено время ожидания получения геолокации';
-            } else if (error.message) {
-              errorMessage = error.message;
-            }
-
-            resolve({
-              location: null,
-              error: errorMessage,
-            });
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 10000,
-          },
-        );
+      const positionResult = await this.getPosition({
+        enableHighAccuracy: true,
+        timeout: 30000,
+        maximumAge: 0,
       });
+
+      if ('location' in positionResult) {
+        return { location: positionResult.location };
+      }
+
+      return {
+        location: null,
+        error: this.mapGeolocationError(positionResult.errorCode, positionResult.message),
+      };
     } catch (error) {
       return {
         location: null,
         error: error instanceof Error ? error.message : 'Неизвестная ошибка',
       };
     }
+  }
+
+  private async getPosition(options: {
+    enableHighAccuracy: boolean;
+    timeout: number;
+    maximumAge: number;
+  }): Promise<{ location: Location } | { errorCode: number; message?: string }> {
+    return new Promise(resolve => {
+      Geolocation.getCurrentPosition(
+        position => {
+          resolve({
+            location: {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+            },
+          });
+        },
+        error => {
+          resolve({ errorCode: error.code, message: error.message });
+        },
+        options,
+      );
+    });
+  }
+
+  private mapGeolocationError(errorCode: number, message?: string): string {
+    if (errorCode === 1) {
+      return 'Пользователь отказал в доступе к геолокации';
+    }
+    if (errorCode === 2) {
+      return 'Ошибка определения местоположения';
+    }
+    if (errorCode === 3) {
+      if (message && message.includes('Unable to fetch location')) {
+        return 'Не удалось получить геолокацию. Проверьте, что разрешение на геолокацию предоставлено в настройках устройства.';
+      }
+      return 'Превышено время ожидания получения геолокации';
+    }
+    return message || 'Ошибка получения геолокации';
   }
 }
 

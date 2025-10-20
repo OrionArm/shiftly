@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
 import { shiftStore } from '../../stores';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import { View, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../hooks/use_theme';
 import { ShiftItem } from './shift_item';
 import { Shift } from '../../types/shift';
@@ -68,12 +68,25 @@ export const ShiftListScreen = observer(({ onNavigateToDetails }: Props) => {
   }
 
   if (shiftStore.error) {
+  
+    
     return (
       <View
         style={[styles.centerContainer, { backgroundColor: theme.background }]}>
         <Text style={[styles.errorText, { color: theme.error }]}>
           Ошибка: {shiftStore.error}
         </Text>
+        
+        <TouchableOpacity
+          style={[styles.retryButton, { backgroundColor: theme.primary }]}
+          onPress={() => shiftStore.retryLoadShifts()}
+          disabled={shiftStore.isLoading}>
+          <Text style={[styles.retryButtonText, { color: theme.background }]}>
+            {shiftStore.isLoading ? 'Повторная попытка...' : 'Повторить попытку'}
+          </Text>
+        </TouchableOpacity>
+        
+      
       </View>
     );
   }
@@ -114,4 +127,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+  retryButton: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  retryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
 });

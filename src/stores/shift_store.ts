@@ -14,27 +14,17 @@ export class ShiftStore {
   }
 
   async loadShifts(): Promise<void> {
-    console.log('🔍 loadShifts вызван');
-    console.log('🔍 userLocation в loadShifts:', locationService.userLocation);
-
     if (!locationService.userLocation) {
-      console.log('🔍 userLocation отсутствует, получаем геолокацию...');
       await locationService.getUserLocation();
     }
 
     if (!locationService.userLocation) {
-      console.log(
-        '❌ userLocation все еще отсутствует после попытки получения',
-      );
-      this.setError('Необходимо разрешить доступ к геолокации для поиска смен');
+      const errorMessage = locationService.error || 'Необходимо разрешить доступ к геолокации для поиска смен';
+      this.setError(errorMessage);
       return;
     }
 
     try {
-      console.log(
-        '✅ Загружаем смены для координат:',
-        locationService.userLocation,
-      );
       this.setLoading(true);
       this.clearError();
       const fetchedShifts = await shiftService.getShiftsByLocation(
@@ -49,6 +39,13 @@ export class ShiftStore {
     }
   }
 
+  async retryLoadShifts(): Promise<void> {
+    this.clearError();
+    await locationService.retryGetUserLocation();
+    await this.loadShifts();
+  }
+
+  
   private setShifts(shifts: Shift[]) {
     this.shifts = shifts;
   }
