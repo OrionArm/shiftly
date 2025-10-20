@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx';
-import { Shift, Location } from '../types/shift';
+import { Shift } from '../types/shift';
 import { shiftService } from '../services/shift_service';
 import { locationService } from '../services/location_service';
 
@@ -39,11 +39,7 @@ export class ShiftStore {
     }
   }
 
-  async retryLoadShifts(): Promise<void> {
-    this.clearError();
-    await locationService.retryGetUserLocation();
-    await this.loadShifts();
-  }
+ 
 
   
   private setShifts(shifts: Shift[]) {

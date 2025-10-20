@@ -25,6 +25,16 @@ class LocationService {
       this.setLocationLoading(true);
       this.clearError();
 
+      // На iOS, если ранее был явный отказ, не дергаем лишний раз геолокацию — подсказка и выход
+      if (Platform.OS === 'ios') {
+        const hasPermission = await this.checkIOSPermissionStatus();
+        if (!hasPermission) {
+          this.setError('Необходимо разрешить доступ к геолокации для поиска смен');
+          this.showSettingsAlert();
+          return;
+        }
+      }
+
       const result = await this.getCurrentLocation();
 
       if (result.location) {
@@ -44,21 +54,7 @@ class LocationService {
     }
   }
 
-  async retryGetUserLocation(): Promise<void> {
-    this.userLocation = null;
-    this.locationPermissionGranted = false;
-    this.error = null;
-    
-    if (Platform.OS === 'ios') {
-      const hasPermission = await this.checkIOSPermissionStatus();
-      if (!hasPermission) {
-        this.showSettingsAlert();
-        return;
-      }
-    }
-    
-    await this.getUserLocation();
-  }
+ 
 
   private async checkIOSPermissionStatus(): Promise<boolean> {
     const result = await this.getPosition({

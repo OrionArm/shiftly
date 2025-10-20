@@ -79,7 +79,7 @@ export const ShiftListScreen = observer(({ onNavigateToDetails }: Props) => {
         
         <TouchableOpacity
           style={[styles.retryButton, { backgroundColor: theme.primary }]}
-          onPress={() => shiftStore.retryLoadShifts()}
+          onPress={() => shiftStore.loadShifts()}
           disabled={shiftStore.isLoading}>
           <Text style={[styles.retryButtonText, { color: theme.background }]}>
             {shiftStore.isLoading ? 'Повторная попытка...' : 'Повторить попытку'}
